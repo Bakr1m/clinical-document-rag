@@ -1,0 +1,35 @@
+# Environments
+.venv/
+venv/
+
+# Python / test caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Data (notes + embeddings + index are regenerable; see README/collect.py)
+data/
+
+# MLflow tracking (regenerable)
+mlruns/
+mlruns_backup*/
+
+# Model artifacts (none trained here; generation via Ollama)
+models/
+*.pt
+*.joblib
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -1,0 +1,8 @@
+# Serving-only dependencies (what the Docker image installs).
+# No torch / MLflow / jupyter: the container serves prebuilt FAISS data and
+# delegates embedding+generation to an Ollama endpoint via OLLAMA_URL.
+fastapi==0.141.1
+uvicorn==0.54.0
+pydantic==2.13.5
+numpy==2.5.3
+faiss-cpu==1.15.1

@@ -1,0 +1,15 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+mlruns/
+mlruns_backup*/
+data/*
+!data/chunks.json
+!data/embeddings.npy
+notebooks/
+tests/
+.git/
+.vscode/
+.idea/
+*.log
