@@ -112,8 +112,8 @@ python api/main.py                      # :8000 (needs Ollama for /ask)
 ## Run with Docker
 
 ```bash
-docker pull bakr1m/rag-api:v1
-docker run -p 8000:8000 -e OLLAMA_URL=http://host-ip:11434 bakr1m/rag-api:v1
+docker pull bakr1m/rag-api:latest
+docker run -p 8000:8000 -e OLLAMA_URL=http://host-ip:11434 bakr1m/rag-api:latest
 curl -X POST http://localhost:8000/ask \
   -H "Content-Type: application/json" -d '{"question":"...?"}'
 ```
