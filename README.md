@@ -1,6 +1,4 @@
-# Project 4: Clinical Document RAG Assistant
-
-**Days 41–50 | Healthcare ML Portfolio**
+# Clinical Document RAG Assistant
 
 ## Business Context
 
@@ -21,22 +19,22 @@ responses — no manual searching, no trusted-blindly LLM output.
 
 ## Approach
 
-1. **Collection + privacy** (Day 41): stratified 10×8 corpus, manifest, note.
-2. **Section chunking** (Day 42): split on `HEADER:` markers, sentence-pack
+1. **Collection + privacy**: stratified 10×8 corpus, manifest, note.
+2. **Section chunking**: split on `HEADER:` markers, sentence-pack
    (≤600 chars, 1-sentence overlap), `[specialty | section]`-prefixed metadata.
-3. **Local embeddings** (Day 42): nomic-embed-text via Ollama, L2-normalized
+3. **Local embeddings**: nomic-embed-text via Ollama, L2-normalized
    (506 × 768) so inner product == cosine.
-4. **FAISS retrieval** (Day 43): exact IndexFlatIP, top-k search.
-5. **Retrieval eval first** (Day 44): 10 queries manually graded — 8/10,
+4. **FAISS retrieval**: exact IndexFlatIP, top-k search.
+5. **Retrieval eval first**: 10 queries manually graded — 8/10,
    misses diagnosed before any generation existed.
-6. **Generation + refusal** (Day 45): `gpt-oss:120b-cloud`, temp 0.2, 300-cap,
+6. **Generation + refusal**: `gpt-oss:120b-cloud`, temp 0.2, 300-cap,
    verbatim `NOT FOUND IN THE PROVIDED NOTES` contract.
-7. **RAG eval set** (Day 46): 17 QA (traps + unanswerables) — hit-rate 13/15,
+7. **RAG eval set**: 17 QA (traps + unanswerables) — hit-rate 13/15,
    correctness 11/17 with named failure modes.
-8. **Verified citations** (Day 47): exact chunk-ID resolution; prefixes and
+8. **Verified citations**: exact chunk-ID resolution; prefixes and
    refusal-citations rejected; prompt fix measured prefix → exact.
-9. **API** (Day 48): stateless `POST /ask` (bounds, rate limit, verified cites).
-10. **Container** (Day 49): 398 MB, env-driven Ollama endpoint, parity-verified.
+9. **API**: stateless `POST /ask` (bounds, rate limit, verified cites).
+10. **Container**: 398 MB, env-driven Ollama endpoint, parity-verified.
 
 ## Results
 
@@ -90,7 +88,7 @@ project4_rag/
 ├ api/main.py            # thin entrypoint (PORT-aware)
 ├ tests/                 # 23 hermetic tests (synthetic + guarded live)
 ├ models/                # *_metrics/eval JSONs (gitignored)
-├ mlruns/                # (Day 46+ tracking if enabled; gitignored)
+├ mlruns/                # experiment tracking if enabled; gitignored
 ├ example via live curl (see Run with Docker)
 ├ Dockerfile (398 MB) + requirements-serve.txt (no torch/GPU weight)
 ├ requirements.txt (full) / requirements-train.txt (indexing stack)
