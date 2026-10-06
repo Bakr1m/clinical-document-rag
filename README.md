@@ -109,14 +109,61 @@ make test                               # hermetic suite
 python api/main.py                      # :8000 (needs Ollama for /ask)
 ```
 
+## Try It in 60 Seconds (no local setup needed)
+
+```bash
+docker pull bakr1m/rag-api:latest
+docker run -d --name rag -p 8004:8000 bakr1m/rag-api:latest
+curl http://localhost:8004/health
+# {"status":"healthy"}
+docker stop rag && docker rm rag
+```
+
+Health proves the serving layer (retrieval index + API). The `/ask`
+endpoint needs a local LLM — no recruiter has one preinstalled, so:
+
+```bash
+# 1. Install + start Ollama (https://ollama.com), then:
+ollama pull llama3.1
+# 2. Run the API pointing at it:
+docker run -d --name rag -p 8004:8000 \
+  -e OLLAMA_URL=http://host.docker.internal:11434 bakr1m/rag-api:latest
+curl -X POST http://localhost:8004/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What did the duplex venous ultrasound show?"}'
+# -> answer + exact [source#section#chunk] citations, or a refusal
+```
+
+(`host.docker.internal` reaches your machine's Ollama from inside the
+container on Docker Desktop; on native Linux use `--network host` with
+`OLLAMA_URL=http://localhost:11434`.)
+
 ## Run with Docker
 
 ```bash
 docker pull bakr1m/rag-api:latest
-docker run -p 8000:8000 -e OLLAMA_URL=http://host-ip:11434 bakr1m/rag-api:latest
+docker run -p 8000:8000 -e OLLAMA_URL=http://host.docker.internal:11434 bakr1m/rag-api:latest
 curl -X POST http://localhost:8000/ask \
   -H "Content-Type: application/json" -d '{"question":"...?"}'
 ```
+
+## Problems Encountered (Build & Deploy)
+
+1. **No Ollama daemon in CI.** `/ask` needs a live LLM, which a GitHub
+   runner doesn't have — so CI smoke-tests health only, and `/ask` is
+   covered by unit tests with stubbed generation. The contract (refusal +
+   citations) is tested; the prose quality is evaluated offline on 17
+   graded Q&As.
+2. **Citations were unverified.** The first version cited chunk IDs the
+   answer didn't actually come from. Fixed with exact-verification:
+   11/13 citations now match the retrieved text verbatim, and anything
+   unverifiable becomes a refusal instead of a guess.
+3. **Refusal as a feature.** "NOT FOUND IN THE PROVIDED NOTES" is a
+   first-class correct output (2/2 correct declines in eval) — a RAG
+   system that can't say "I don't know" will hallucinate citations.
+4. **Two-file artifact.** Unlike the single-model repos, this one ships
+   chunks + embeddings as two release assets with two SHA checks — the
+   Dockerfile fails closed if either hash mismatches.
 
 ## Key Learnings
 
