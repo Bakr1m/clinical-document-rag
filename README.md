@@ -36,6 +36,25 @@ responses — no manual searching, no trusted-blindly LLM output.
 9. **API**: stateless `POST /ask` (bounds, rate limit, verified cites).
 10. **Container**: 398 MB, env-driven Ollama endpoint, parity-verified.
 
+
+### Architecture
+
+```mermaid
+flowchart LR
+  A["80 clinical notes<br/>10 specialties"] --> B["Section chunking<br/>HEADER split, 600ch"]
+  B --> C["nomic-embed-text<br/>Ollama, 506x768 L2"]
+  C --> D["FAISS IndexFlatIP<br/>exact top-k"]
+  D --> E["Retriever<br/>top-3, 8/10 graded"]
+  E --> F{"LLM gpt-oss:120b<br/>temp 0.2 + refusal"}
+  F -->|evidence found| G["Cited answer<br/>exact chunk-ID"]
+  F -->|no evidence| H["NOT FOUND<br/>refusal, no cite"]
+  G --> I["FastAPI POST /ask<br/>bounds + rate limit"]
+  H --> I
+  I --> J["Docker 398MB<br/>parity-verified"]
+```
+
+> Source: `docs/architecture.mmd`
+
 ## Results
 
 | Stage | Metric |
